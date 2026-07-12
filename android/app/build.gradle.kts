@@ -1,44 +1,132 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     id("com.android.application")
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+
+val useReleaseKeystore =
+    System.getenv("USE_RELEASE_KEYSTORE") == "true"
+
+
+val keystoreProperties = Properties()
+val keystorePropertiesFile = rootProject.file("key.properties")
+
+
+if (useReleaseKeystore && keystorePropertiesFile.exists()) {
+    keystoreProperties.load(
+        FileInputStream(keystorePropertiesFile)
+    )
+}
+
+
 android {
-    namespace = "com.example.z_note"
+
+    namespace = "com.mickeyzz.z_note"
+
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
+
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
 
+
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.z_note"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
+
+        applicationId = "com.mickeyzz.z_note"
+
         minSdk = flutter.minSdkVersion
+
         targetSdk = flutter.targetSdkVersion
+
         versionCode = flutter.versionCode
+
         versionName = flutter.versionName
     }
 
+
+
+    signingConfigs {
+
+
+        create("release") {
+
+
+            if (useReleaseKeystore) {
+
+
+                keyAlias =
+                    keystoreProperties["keyAlias"] as String
+
+
+                keyPassword =
+                    keystoreProperties["keyPassword"] as String
+
+
+                storePassword =
+                    keystoreProperties["storePassword"] as String
+
+
+                storeFile =
+                    file(
+                        keystoreProperties["storeFile"] as String
+                    )
+            }
+        }
+    }
+
+
+
     buildTypes {
-        release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+
+
+        getByName("release") {
+
+
+            if (useReleaseKeystore) {
+
+                signingConfig =
+                    signingConfigs.getByName("release")
+
+            } else {
+
+                signingConfig =
+                    signingConfigs.getByName("debug")
+            }
+
+
+            // 开启 R8 混淆
+            isMinifyEnabled = true
+
+            // 删除无用资源
+            isShrinkResources = true
+
+
+            proguardFiles(
+                getDefaultProguardFile(
+                    "proguard-android-optimize.txt"
+                ),
+                "proguard-rules.pro"
+            )
         }
     }
 }
 
+
+
 kotlin {
     compilerOptions {
-        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+        jvmTarget =
+            org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
     }
 }
+
+
 
 flutter {
     source = "../.."

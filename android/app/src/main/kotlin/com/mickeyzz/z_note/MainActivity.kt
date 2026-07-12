@@ -1,4 +1,4 @@
-package com.example.z_note
+package com.mickeyzz.z_note
 
 import io.flutter.embedding.android.FlutterActivity
 
