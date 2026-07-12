@@ -37,7 +37,7 @@ jobs:
 
       with:
 
-        flutter-version: stable
+        flutter-version: "3.35.0"
 
 
 
