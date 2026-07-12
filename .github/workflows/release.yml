@@ -1,36 +1,76 @@
 name: Release Build
 
+
 on:
+
   workflow_dispatch:
 
+
 permissions:
+
   contents: write
+
 
 
 jobs:
 
+
   build:
+
 
     runs-on: ubuntu-latest
 
+
+
     steps:
 
+
     - name: Checkout
+
       uses: actions/checkout@v4
 
 
+
     - name: Setup Flutter
+
       uses: subosito/flutter-action@v2
+
       with:
+
         flutter-version: stable
 
 
-    - name: Create keystore
+
+    # 读取 pubspec.yaml 版本
+
+    - name: Get version
+
+      id: version
+
       run: |
+
+        VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: //')
+
+        NAME=$(echo $VERSION | cut -d'+' -f1)
+
+        CODE=$(echo $VERSION | cut -d'+' -f2)
+
+
+        echo "name=$NAME" >> $GITHUB_OUTPUT
+
+        echo "code=$CODE" >> $GITHUB_OUTPUT
+
+
+
+    - name: Create keystore
+
+      run: |
+
 
         echo "${{ secrets.KEYSTORE_BASE64 }}" \
         | base64 --decode \
         > release.jks
+
 
 
         cat <<EOF > android/key.properties
@@ -46,20 +86,18 @@ jobs:
         EOF
 
 
-    - name: Build
+
+    - name: Build APK and AAB
 
       env:
 
         USE_RELEASE_KEYSTORE: true
 
+
       run: |
 
-        flutter pub get
 
-        flutter build appbundle \
-        --release \
-        --obfuscate \
-        --split-debug-info=build/debug-info
+        flutter pub get
 
 
         flutter build apk \
@@ -69,15 +107,24 @@ jobs:
 
 
 
-    - name: Create Release
+        flutter build appbundle \
+        --release \
+        --obfuscate \
+        --split-debug-info=build/debug-info
+
+
+
+    - name: Create GitHub Release
+
 
       uses: softprops/action-gh-release@v2
 
+
       with:
 
-        tag_name: v${{ github.run_number }}
+        tag_name: v${{ steps.version.outputs.name }}
 
-        name: Z Note Release v${{ github.run_number }}
+        name: Z Note v${{ steps.version.outputs.name }}
 
         files: |
 
