@@ -45,7 +45,7 @@ jobs:
 
       with:
 
-        flutter-version: "你的Flutter版本"
+        flutter-version: "3.44.4"
 
         channel: stable
 
