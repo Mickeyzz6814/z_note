@@ -7,49 +7,75 @@ plugins {
 }
 
 
-val useReleaseKeystore =
-    System.getenv("USE_RELEASE_KEYSTORE") == "true"
-
+// -------------------------
+// Load keystore properties
+// -------------------------
 
 val keystoreProperties = Properties()
-val keystorePropertiesFile = rootProject.file("key.properties")
+
+val keystorePropertiesFile =
+    rootProject.file("key.properties")
 
 
-if (useReleaseKeystore && keystorePropertiesFile.exists()) {
+val hasReleaseKeystore =
+    keystorePropertiesFile.exists()
+
+
+if (hasReleaseKeystore) {
+
     keystoreProperties.load(
         FileInputStream(keystorePropertiesFile)
     )
 }
 
 
+// -------------------------
+// Android
+// -------------------------
+
 android {
 
     namespace = "com.mickeyzz.z_note"
 
     compileSdk = flutter.compileSdkVersion
+
     ndkVersion = flutter.ndkVersion
 
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+
+        sourceCompatibility =
+            JavaVersion.VERSION_17
+
+        targetCompatibility =
+            JavaVersion.VERSION_17
     }
+
 
 
     defaultConfig {
 
-        applicationId = "com.mickeyzz.z_note"
+        applicationId =
+            "com.mickeyzz.z_note"
 
-        minSdk = flutter.minSdkVersion
+        minSdk =
+            flutter.minSdkVersion
 
-        targetSdk = flutter.targetSdkVersion
+        targetSdk =
+            flutter.targetSdkVersion
 
-        versionCode = flutter.versionCode
+        versionCode =
+            flutter.versionCode
 
-        versionName = flutter.versionName
+        versionName =
+            flutter.versionName
     }
 
 
+
+    // -------------------------
+    // Signing
+    // -------------------------
 
     signingConfigs {
 
@@ -57,7 +83,7 @@ android {
         create("release") {
 
 
-            if (useReleaseKeystore) {
+            if (hasReleaseKeystore) {
 
 
                 keyAlias =
@@ -76,17 +102,33 @@ android {
                     file(
                         keystoreProperties["storeFile"] as String
                     )
-                
+
 
                 enableV1Signing = true
 
-
                 enableV2Signing = true
+
+                enableV3Signing = true
+
+            } else {
+
+                throw GradleException(
+                    """
+                    Release keystore not found.
+
+                    Please create key.properties
+                    or provide keystore in CI.
+                    """.trimIndent()
+                )
             }
         }
     }
 
 
+
+    // -------------------------
+    // Build Types
+    // -------------------------
 
     buildTypes {
 
@@ -94,29 +136,25 @@ android {
         getByName("release") {
 
 
-            if (useReleaseKeystore) {
-
-                signingConfig =
-                    signingConfigs.getByName("release")
-
-            } else {
-
-                signingConfig =
-                    signingConfigs.getByName("debug")
-            }
+            signingConfig =
+                signingConfigs.getByName("release")
 
 
-            // 开启 R8 混淆
+            // R8
             isMinifyEnabled = true
 
-            // 删除无用资源
+
+            // Remove unused resources
             isShrinkResources = true
 
 
+
             proguardFiles(
+
                 getDefaultProguardFile(
                     "proguard-android-optimize.txt"
                 ),
+
                 "proguard-rules.pro"
             )
         }
@@ -125,8 +163,15 @@ android {
 
 
 
+
+// -------------------------
+// Kotlin
+// -------------------------
+
 kotlin {
+
     compilerOptions {
+
         jvmTarget =
             org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
     }
@@ -134,6 +179,12 @@ kotlin {
 
 
 
+
+// -------------------------
+// Flutter
+// -------------------------
+
 flutter {
+
     source = "../.."
 }
