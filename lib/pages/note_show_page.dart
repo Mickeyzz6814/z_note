@@ -128,12 +128,13 @@ class _NoteShowPageState extends State<NoteShowPage> with RouteAware {
         child: SingleChildScrollView(
           child: note == null
               ? Container(
-                  width: double.infinity,
-                  height: double.infinity,
+                  //width: double.infinity,
+                  //height: double.infinity,
                   alignment: Alignment.center,
                   child: Text('找不到笔记'),
                 )
               : Column(
+                  mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

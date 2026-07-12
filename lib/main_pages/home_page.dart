@@ -110,14 +110,14 @@ class _HomePageState extends State<HomePage> with RouteAware {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    '${item.title}',
+                                    '${item.title.trim()}',
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(fontSize: 18),
                                   ),
                                   SizedBox(height: 4),
                                   Text(
-                                    '${item.content}',
+                                    '${item.content.trim()}',
                                     maxLines: 5,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(fontSize: 12),

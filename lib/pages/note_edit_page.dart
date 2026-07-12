@@ -146,6 +146,29 @@ class _NoteEditPageState extends State<NoteEditPage> {
     }
   }
 
+  Future<void> showExitDialogThree() async {
+    final res = await showDialog<int>(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: Text('标题或正文为空'),
+          content: Text('您的标题或正文为空，无法保存！'),
+          actionsPadding: EdgeInsets.only(right: 12, bottom: 8),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('确定'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<String?> saveHandle() async {
     final String title = _titleController.text;
     final String content = _contentController.text;
@@ -205,6 +228,11 @@ class _NoteEditPageState extends State<NoteEditPage> {
           return;
         }
 
+        if (_titleController.text.isEmpty || _contentController.text.isEmpty) {
+          await showExitDialogThree();
+          return;
+        }
+
         bool canExit = await showExitDialog();
         if (canExit) {
           if (mounted) Navigator.pop(context);
@@ -216,6 +244,10 @@ class _NoteEditPageState extends State<NoteEditPage> {
             IconButton(
               onPressed: () async {
                 final targetId = await saveHandle();
+                if (targetId == null) {
+                  await showExitDialogThree();
+                  return;
+                }
                 if (mounted && targetId != null) {
                   Navigator.pop(context);
                 }
@@ -241,7 +273,7 @@ class _NoteEditPageState extends State<NoteEditPage> {
                     hintText: '标题',
                     border: InputBorder.none,
                   ),
-                  style: TextStyle(fontSize: 28),
+                  style: TextStyle(fontSize: 27),
                 ),
                 //SizedBox(height: 20),
                 TextField(
