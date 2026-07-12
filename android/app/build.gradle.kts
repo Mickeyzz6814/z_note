@@ -76,6 +76,12 @@ android {
                     file(
                         keystoreProperties["storeFile"] as String
                     )
+                
+
+                enableV1Signing = true
+
+
+                enableV2Signing = true
             }
         }
     }
