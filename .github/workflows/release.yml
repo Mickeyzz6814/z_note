@@ -1,178 +1,149 @@
 name: Release Build
 
-
 on:
-
   workflow_dispatch:
 
-
 permissions:
-
   contents: write
 
-
-
 jobs:
-
-
   build:
-
-
     runs-on: ubuntu-latest
 
-
     steps:
-
-
-    # 拉取源码
-    - name: Checkout
-
-      uses: actions/checkout@v5
-
-
-
-    # Flutter 环境
-    # 改成你本地 flutter --version 的版本
-
-    - name: Setup Flutter
-
-      uses: subosito/flutter-action@v2
-
-      with:
-
-        flutter-version: "3.44.4"
-
-        channel: stable
-
-        cache: true
-
-
-
-    # 读取版本号
-
-    - name: Get Version
-
-      id: version
-
-      shell: bash
-
-      run: |
-
-        VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: //')
-
-        NAME=$(echo "$VERSION" | cut -d'+' -f1)
-
-        CODE=$(echo "$VERSION" | cut -d'+' -f2)
-
-
-        echo "name=$NAME" >> "$GITHUB_OUTPUT"
-
-        echo "code=$CODE" >> "$GITHUB_OUTPUT"
-
-
-
-
-    # 创建 keystore
-
-    - name: Create Keystore
-
-      shell: bash
-
-      run: |
-
-
-        echo "${{ secrets.KEYSTORE_BASE64 }}" \
-        | base64 --decode \
-        > android/app/release.jks
-
-
-
-        cat <<EOF > android/key.properties
-
-        storePassword=${{ secrets.STORE_PASSWORD }}
-
-        keyPassword=${{ secrets.KEY_PASSWORD }}
-
-        keyAlias=${{ secrets.KEY_ALIAS }}
-
-        storeFile=release.jks
-
-        EOF
-
-
-
-
-    # 获取依赖
-
-    - name: Flutter Pub Get
-
-      run: |
-
-        flutter pub get
-
-
-
-
-
-    # 构建 Universal APK
-
-    - name: Build Universal APK
-
-      run: |
-
-        flutter build apk --release \
-          --obfuscate \
-          --split-debug-info=build/debug-info
-
-
-
-
-
-    # 构建分架构 APK
-
-    - name: Build Split APK
-
-      run: |
-
-        flutter build apk --release \
-          --split-per-abi \
-          --obfuscate \
-          --split-debug-info=build/debug-info
-
-
-
-
-
-    # 创建 Release
-
-    - name: Create GitHub Release
-
-      uses: softprops/action-gh-release@v2
-
-
-      with:
-
-        tag_name: v${{ steps.version.outputs.name }}
-
-
-        name: Z Note v${{ steps.version.outputs.name }}
-
-
-        body: |
-
-          Z Note Release
-
-          Version: ${{ steps.version.outputs.name }}
-
-          Version Code: ${{ steps.version.outputs.code }}
-
-
-        files: |
-
-          build/app/outputs/flutter-apk/app-release.apk
-
-          build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
-
-          build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
-
-          build/app/outputs/flutter-apk/app-x86_64-release.apk
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Flutter 环境
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.44.4"
+          channel: stable
+          cache: true
+
+      # 读取版本号
+      - name: Get Version
+        id: version
+        shell: bash
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: //')
+          NAME=$(echo "$VERSION" | cut -d'+' -f1)
+          CODE=$(echo "$VERSION" | cut -d'+' -f2)
+
+          echo "name=$NAME" >> "$GITHUB_OUTPUT"
+          echo "code=$CODE" >> "$GITHUB_OUTPUT"
+          echo "tag=v$NAME" >> "$GITHUB_OUTPUT"
+          echo "📋 检测版本: $NAME (code: $CODE)"
+
+      # 版本冲突检查
+      - name: Check if Version Already Exists
+        shell: bash
+        run: |
+          TAG="${{ steps.version.outputs.tag }}"
+          echo "🔍 正在检查 Tag: $TAG"
+
+          if git tag -l | grep -q "^\( TAG \)"; then
+            echo "❌ 错误：Git Tag $TAG 已存在！"
+            exit 1
+          fi
+
+          RESPONSE=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/repos/${{ github.repository }}/releases/tags/$TAG)
+
+          if echo "$RESPONSE" | jq -e '.id' > /dev/null 2>&1; then
+            echo "❌ 错误：GitHub Release $TAG 已存在！"
+            exit 1
+          fi
+
+          echo "✅ 版本 $TAG 不存在，可以继续发布"
+
+      # ==================== 智能签名配置（自动生成） ====================
+      - name: Setup Signing (Auto Generate)
+        id: signing
+        shell: bash
+        run: |
+          echo "🔍 检测签名 Secrets 是否配置..."
+
+          if [ -n "${{ secrets.KEYSTORE_BASE64 }}" ] && \
+             [ -n "${{ secrets.STORE_PASSWORD }}" ] && \
+             [ -n "${{ secrets.KEY_PASSWORD }}" ] && \
+             [ -n "${{ secrets.KEY_ALIAS }}" ]; then
+            
+            echo "✅ 检测到完整签名 Secrets，开始自动生成配置文件..."
+
+            # 智能选择 jks 保存路径（更容错）
+            JKS_PATH="android/app/release.jks"
+            PROP_PATH="android/key.properties"
+
+            # 如果 android/app 目录不存在，则尝试 android/ 根目录
+            if [ ! -d "android/app" ]; then
+              JKS_PATH="android/release.jks"
+              PROP_PATH="android/key.properties"
+              echo "📁 使用 android/ 根目录存放签名文件"
+            fi
+
+            # 生成 keystore 文件
+            echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > "$JKS_PATH"
+            echo "✅ 已生成 keystore 文件 → $JKS_PATH"
+
+            # 自动生成 key.properties
+            cat <<EOF > "$PROP_PATH"
+          storePassword=${{ secrets.STORE_PASSWORD }}
+          keyPassword=${{ secrets.KEY_PASSWORD }}
+          keyAlias=${{ secrets.KEY_ALIAS }}
+          storeFile=$(basename "$JKS_PATH")
+          EOF
+
+            echo "✅ 已自动生成 key.properties → $PROP_PATH"
+            echo "keystore=true" >> "$GITHUB_OUTPUT"
+            echo "✅ 签名配置完成"
+          else
+            echo "⚠️ 未检测到签名 Secrets，将构建未签名 APK"
+            echo "keystore=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Flutter Pub Get
+        run: flutter pub get
+
+      # 构建 Universal APK
+      - name: Build Universal APK
+        run: |
+          if [ "${{ steps.signing.outputs.keystore }}" = "true" ]; then
+            echo "🔐 正在构建【已签名】 Universal APK..."
+            flutter build apk --release --obfuscate --split-debug-info=build/debug-info
+          else
+            echo "⚠️ 正在构建【未签名】 Universal APK..."
+            flutter build apk --release --no-sign --obfuscate --split-debug-info=build/debug-info
+          fi
+
+      # 构建 Split APK
+      - name: Build Split APK
+        run: |
+          if [ "${{ steps.signing.outputs.keystore }}" = "true" ]; then
+            echo "🔐 正在构建【已签名】 Split APK..."
+            flutter build apk --release --split-per-abi --obfuscate --split-debug-info=build/debug-info
+          else
+            echo "⚠️ 正在构建【未签名】 Split APK..."
+            flutter build apk --release --split-per-abi --no-sign --obfuscate --split-debug-info=build/debug-info
+          fi
+
+      # 创建 Release
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: Z Note ${{ steps.version.outputs.name }}
+          body: |
+            Z Note Release
+
+            Version: ${{ steps.version.outputs.name }}
+            Version Code: ${{ steps.version.outputs.code }}
+            Signing Status: ${{ steps.signing.outputs.keystore == 'true' && '已签名' || '未签名' }}
+          files: |
+            build/app/outputs/flutter-apk/app-release.apk
+            build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+            build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
+            build/app/outputs/flutter-apk/app-x86_64-release.apk
