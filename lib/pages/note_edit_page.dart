@@ -147,7 +147,7 @@ class _NoteEditPageState extends State<NoteEditPage> {
   }
 
   Future<void> showExitDialogThree() async {
-    final res = await showDialog<int>(
+    showDialog(
       barrierDismissible: false,
       context: context,
       builder: (context) {
