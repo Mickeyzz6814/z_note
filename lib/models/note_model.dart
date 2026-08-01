@@ -32,7 +32,7 @@ class NoteModel {
       id: id,
       title: title ?? this.title,
       content: content ?? this.content,
-      createTime: DateTime.now(),
+      createTime: createTime,
       updateTime: updateTime ?? DateTime.now(),
     );
   }
