@@ -119,17 +119,6 @@ jobs:
             flutter build apk --release --no-sign --obfuscate --split-debug-info=build/debug-info
           fi
 
-      # 构建 Split APK
-      - name: Build Split APK
-        run: |
-          if [ "${{ steps.signing.outputs.keystore }}" = "true" ]; then
-            echo "🔐 正在构建【已签名】 Split APK..."
-            flutter build apk --release --split-per-abi --obfuscate --split-debug-info=build/debug-info
-          else
-            echo "⚠️ 正在构建【未签名】 Split APK..."
-            flutter build apk --release --split-per-abi --no-sign --obfuscate --split-debug-info=build/debug-info
-          fi
-
       # 创建 Release
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -144,6 +133,3 @@ jobs:
             Signing Status: ${{ steps.signing.outputs.keystore == 'true' && '已签名' || '未签名' }}
           files: |
             build/app/outputs/flutter-apk/app-release.apk
-            build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
-            build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
-            build/app/outputs/flutter-apk/app-x86_64-release.apk
