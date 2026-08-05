@@ -111,26 +111,30 @@ class CheckUpdate {
           },
         );
       } else {
-        //print('不需要更新');
-        await showDialog(
-          context: navigatorKey.currentContext!,
-          useRootNavigator: true,
-          builder: (ctx) {
-            return AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              title: Text('最新版本'),
-              content: Text('当前已经是最新版本(≧∇≦)，暂时不需要更新哒~'),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(ctx),
-                  child: Text('确定'),
+        if (remoteBuildId == localBuildId) {
+          //print('不需要更新');
+          await showDialog(
+            context: navigatorKey.currentContext!,
+            useRootNavigator: true,
+            builder: (ctx) {
+              return AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
                 ),
-              ],
-            );
-          },
-        );
+                title: Text('最新版本'),
+                content: Text('当前已经是最新版本(≧∇≦)，暂时不需要更新哒~'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    child: Text('确定'),
+                  ),
+                ],
+              );
+            },
+          );
+        } else {
+          return;
+        }
       }
     } catch (e) {
       //print('${e.toString()}');
