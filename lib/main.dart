@@ -14,7 +14,7 @@ import 'package:z_note/pages/note_show_page.dart';
 final RouteObserver<ModalRoute> routeObserver = RouteObserver<ModalRoute>();
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 bool hasShow = false;
-int localBuildId = 6; //更新前记得改
+int localBuildId = 7; //更新前记得改
 
 void main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
