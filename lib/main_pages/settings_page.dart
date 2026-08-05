@@ -21,6 +21,7 @@ class _SettingsPageState extends State<SettingsPage> {
     if (settings == null) {
       final ss = SettingsModel(autoCheckUpdate: true);
       settingsBox.put(0, ss);
+      settings = SettingsModel(autoCheckUpdate: true);
     }
     _autoCheckUpdateSwitchValue = settings!.autoCheckUpdate;
   }
