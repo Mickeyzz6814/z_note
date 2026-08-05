@@ -17,7 +17,7 @@ class CheckUpdate {
     if (!await canLaunchUrl(url)) {
       // 失败弹窗提示
       if (context.mounted) {
-        await showFailDialog(context, '未找到可用应用打开链接');
+        await showFailDialog(context, '找不到可以打开该链接的应用哦(>_<)');
       }
       return;
     }
@@ -37,7 +37,7 @@ class CheckUpdate {
               color: Theme.of(context).colorScheme.error,
             ),
             SizedBox(width: 8),
-            Text("打开失败"),
+            Text("打开失败(T_T)"),
           ],
         ),
         content: Text(msg),
@@ -51,7 +51,7 @@ class CheckUpdate {
   static Future<void> autoCheckUpdate() async {
     final settingsBox = Hive.box<SettingsModel>('settings_box');
     SettingsModel? settings = settingsBox.get(0)!;
-    bool isOn = settings!.autoCheckUpdate;
+    bool isOn = settings.autoCheckUpdate;
     if (isOn) {
       if (hasShow == false) {
         //print('自动更新调用网络操作函数');
@@ -88,7 +88,7 @@ class CheckUpdate {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
-              title: Text('发现新版本 $remoteVersionName'),
+              title: Text('哇，有新版本可以更新咯(^ω^)! v$remoteVersionName'),
               content: Container(
                 height: 130,
                 child: SingleChildScrollView(child: Text(remoteUpdateLog)),
@@ -112,8 +112,60 @@ class CheckUpdate {
         );
       } else {
         //print('不需要更新');
-        return;
+        await showDialog(
+          context: navigatorKey.currentContext!,
+          useRootNavigator: true,
+          builder: (ctx) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              title: Text('最新版本'),
+              content: Text('当前已经是最新版本(≧∇≦)，暂时不需要更新哒~'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: Text('确定'),
+                ),
+              ],
+            );
+          },
+        );
       }
-    } catch (_) {}
+    } catch (e) {
+      //print('${e.toString()}');
+      await showDialog(
+        context: navigatorKey.currentContext!,
+        useRootNavigator: true,
+        builder: ((context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: Text('哎呀，出错了(>_<)!'),
+            content: Container(
+              child: Column(
+                children: [
+                  Container(child: Text('可以通过 GitHub/邮箱联系作者，尽量完整说明问题呀!')),
+                  SizedBox(height: 8),
+                  Container(
+                    height: 280,
+                    child: SingleChildScrollView(
+                      child: Text('${e.toString()}'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('确定'),
+              ),
+            ],
+          );
+        }),
+      );
+    }
   }
 }

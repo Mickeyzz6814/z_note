@@ -79,8 +79,8 @@ class _NoteEditPageState extends State<NoteEditPage> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
-          title: Text('内容尚未保存'),
-          content: Text('当前笔记内容发生变化，请问如何处理？'),
+          title: Text('内容还没有保存哦(>_<)'),
+          content: Text('笔记内容发生了变化，请问要怎么处理呢？'),
           actionsPadding: EdgeInsets.only(right: 12, bottom: 8),
           actions: [
             TextButton(
@@ -122,8 +122,8 @@ class _NoteEditPageState extends State<NoteEditPage> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
-          title: Text('删除笔记'),
-          content: Text('您清空了笔记内容，该笔记将会删除！'),
+          title: Text('删除笔记(T_T)'),
+          content: Text('你清空了笔记全部内容，这篇笔记将会被删除！'),
           actionsPadding: EdgeInsets.only(right: 12, bottom: 8),
           actions: [
             FilledButton(
@@ -155,8 +155,8 @@ class _NoteEditPageState extends State<NoteEditPage> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
-          title: Text('标题或正文为空'),
-          content: Text('您的标题或正文为空，无法保存！'),
+          title: Text('标题或者正文为空哦(^_^;)'),
+          content: Text('标题和正文不能为空，暂时无法保存！'),
           actionsPadding: EdgeInsets.only(right: 12, bottom: 8),
           actions: [
             TextButton(
@@ -270,7 +270,7 @@ class _NoteEditPageState extends State<NoteEditPage> {
                   controller: _titleController,
                   maxLines: 1,
                   decoration: InputDecoration(
-                    hintText: '标题',
+                    hintText: '写下标题吧',
                     border: InputBorder.none,
                   ),
                   style: TextStyle(fontSize: 27),
@@ -283,7 +283,7 @@ class _NoteEditPageState extends State<NoteEditPage> {
                   maxLength: null,
                   decoration: InputDecoration(
                     border: InputBorder.none,
-                    hintText: '正文',
+                    hintText: '记录你的想法~',
                   ),
                 ),
               ],

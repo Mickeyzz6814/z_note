@@ -46,7 +46,7 @@ class _AboutPageState extends State<AboutPage> {
     if (!await canLaunchUrl(url)) {
       // 失败弹窗提示
       if (context.mounted) {
-        await showFailDialog(context, '未找到可用应用打开链接');
+        await showFailDialog(context, '找不到可以打开该链接的应用哦(>_<)!');
       }
       return;
     }
@@ -72,7 +72,7 @@ class _AboutPageState extends State<AboutPage> {
     final Uri uri = Uri.parse(mailUrl);
     if (!await canLaunchUrl(uri)) {
       if (context.mounted) {
-        await showFailDialog(context, '未找到可用应用打开链接');
+        await showFailDialog(context, '找不到可以打开该链接的应用哦(>_<)!');
       }
       return;
     }
@@ -91,7 +91,7 @@ class _AboutPageState extends State<AboutPage> {
               color: Theme.of(context).colorScheme.error,
             ),
             SizedBox(width: 8),
-            Text("打开失败"),
+            Text("打开失败(T_T)!"),
           ],
         ),
         content: Text(msg),
@@ -154,7 +154,7 @@ class _AboutPageState extends State<AboutPage> {
                       leading: Icon(Icons.update),
                       title: Text('检查更新'),
                       subtitle: Text(
-                        '确保您运行最新版本',
+                        '检查一下，确认是最新版本啦(T_T)!',
                         style: TextStyle(fontSize: 12),
                       ),
                       trailing: Icon(Icons.arrow_forward_ios),
@@ -164,7 +164,7 @@ class _AboutPageState extends State<AboutPage> {
                       leading: FaIcon(FontAwesomeIcons.github, size: 20),
                       title: Text('查看源码'),
                       subtitle: Text(
-                        '在Github上查看本项目的源码',
+                        '来GitHub查看本项目的源码吧(^ω^)!',
                         style: TextStyle(fontSize: 12),
                       ),
                       trailing: Icon(Icons.arrow_forward_ios),
@@ -179,7 +179,7 @@ class _AboutPageState extends State<AboutPage> {
                       leading: Icon(Icons.bug_report),
                       title: Text('反馈问题'),
                       subtitle: Text(
-                        '通过邮箱向我们反馈你遇到的问题',
+                        '通过邮箱反馈你遇到的问题(T_T)!',
                         style: TextStyle(fontSize: 12),
                       ),
                       trailing: Icon(Icons.arrow_forward_ios),

@@ -30,8 +30,8 @@ class _NoteShowPageState extends State<NoteShowPage> with RouteAware {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
-          title: Text('确定要删除吗？'),
-          content: Text('您正在删除笔记，这将不可撤回！'),
+          title: Text('确定要删除吗(T_T)'),
+          content: Text('你将要删除这篇笔记，操作是无法撤回的哦！'),
           actionsPadding: EdgeInsets.only(right: 12, bottom: 8),
           actions: [
             FilledButton(
@@ -131,7 +131,7 @@ class _NoteShowPageState extends State<NoteShowPage> with RouteAware {
                   //width: double.infinity,
                   //height: double.infinity,
                   alignment: Alignment.center,
-                  child: Text('找不到笔记'),
+                  child: Text('找不到笔记(>_<)'),
                 )
               : Column(
                   mainAxisSize: MainAxisSize.min,

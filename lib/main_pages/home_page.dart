@@ -69,7 +69,7 @@ class _HomePageState extends State<HomePage> with RouteAware {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Z Note', style: TextStyle(fontSize: 27)),
-            Text('好用的笔记app', style: TextStyle(fontSize: 9.5)),
+            Text('好用的笔记APP(^ω^)!', style: TextStyle(fontSize: 9.5)),
           ],
         ),
       ),
@@ -95,7 +95,7 @@ class _HomePageState extends State<HomePage> with RouteAware {
                             //height: double.infinity,
                             //width: double.infinity,
                             //alignment: Alignment.center,
-                            child: Center(child: Text('这里一片荒芜')),
+                            child: Center(child: Text('呜呜，这里空空荡荡的(T_T)!')),
                           ),
                         ),
                       ],

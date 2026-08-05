@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
-import 'package:z_note/pages/update_page.dart';
 import 'package:z_note/start.dart';
 import 'package:z_note/home.dart';
 //import 'package:z_note/main_pages/home_page.dart';
@@ -46,7 +45,6 @@ class _MyAppState extends State<MyApp> {
         '/edit': (context) => NoteEditPage(),
         '/show': (context) => NoteShowPage(),
         '/home': (context) => Home(),
-        '/update': (context) => updatePage(),
       },
       title: 'Z Note',
       //home: Home(),
