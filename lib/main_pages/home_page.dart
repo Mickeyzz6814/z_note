@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:z_note/db/note_db.dart';
 import 'package:z_note/main.dart';
 import 'package:z_note/models/note_model.dart';
+import 'package:z_note/settings/update.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -32,6 +33,7 @@ class _HomePageState extends State<HomePage> with RouteAware {
   void initState() {
     // TODO: implement initState
     super.initState();
+    CheckUpdate.autoCheckUpdate();
     loadNotes();
   }
 

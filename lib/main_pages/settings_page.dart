@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:z_note/models/settings_model.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -8,6 +10,21 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
+  bool _autoCheckUpdateSwitchValue = true;
+  SettingsModel? settings;
+
+  @override
+  void initState() {
+    super.initState();
+    final settingsBox = Hive.box<SettingsModel>('settings_box');
+    settings = settingsBox.get(0);
+    if (settings == null) {
+      final ss = SettingsModel(autoCheckUpdate: true);
+      settingsBox.put(0, ss);
+    }
+    _autoCheckUpdateSwitchValue = settings!.autoCheckUpdate;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,6 +40,27 @@ class _SettingsPageState extends State<SettingsPage> {
             Container(
               padding: EdgeInsets.only(left: 10),
               child: Text('更多', style: TextStyle(fontSize: 13)),
+            ),
+            Card(
+              clipBehavior: Clip.antiAlias, // 裁切多余阴影
+              elevation: 0,
+              child: ListTile(
+                leading: Icon(Icons.update),
+                title: Text('自动检查更新'),
+                trailing: Switch(
+                  value: _autoCheckUpdateSwitchValue,
+                  onChanged: (bool newValue) async {
+                    _autoCheckUpdateSwitchValue = newValue;
+                    settings!.autoCheckUpdate = _autoCheckUpdateSwitchValue;
+                    await settings!.save();
+                    setState(() {});
+                    //print('${settings!.autoCheckUpdate}');
+                  },
+                ),
+                //onTap: () {
+                //  Navigator.pushNamed(context, '/about');
+                //},
+              ),
             ),
             Card(
               clipBehavior: Clip.antiAlias, // 裁切多余阴影

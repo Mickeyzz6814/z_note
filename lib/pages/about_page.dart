@@ -3,6 +3,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:z_note/settings/update.dart';
 
 class AboutPage extends StatefulWidget {
   const AboutPage({super.key});
@@ -149,6 +150,16 @@ class _AboutPageState extends State<AboutPage> {
                 elevation: 0,
                 child: Column(
                   children: [
+                    ListTile(
+                      leading: Icon(Icons.update),
+                      title: Text('检查更新'),
+                      subtitle: Text(
+                        '确保您运行最新版本',
+                        style: TextStyle(fontSize: 12),
+                      ),
+                      trailing: Icon(Icons.arrow_forward_ios),
+                      onTap: () async => await CheckUpdate.checkUpdate(),
+                    ),
                     ListTile(
                       leading: FaIcon(FontAwesomeIcons.github, size: 20),
                       title: Text('查看源码'),
