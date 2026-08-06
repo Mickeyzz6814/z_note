@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:z_note/core/providers/theme_provider.dart';
 import 'package:z_note/data/models/settings_model.dart';
 import 'package:z_note/data/repositories/settings_repository.dart';
 
@@ -11,8 +13,10 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   bool _autoCheckUpdateSwitchValue = true;
+  bool _darkModeValue = false;
   SettingsModel? settings;
-  bool? value;
+  bool? updateValue;
+  bool? darkModeValue;
 
   @override
   void initState() {
@@ -28,13 +32,17 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> _loadData() async {
-    value = await SettingsRepository.getUpdateInformation();
+    updateValue = await SettingsRepository.getUpdateInformation();
+    darkModeValue = await SettingsRepository.getThemeInformation();
+    _autoCheckUpdateSwitchValue = updateValue!;
+    _darkModeValue = darkModeValue!;
     setState(() {});
-    _autoCheckUpdateSwitchValue = value!;
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.watch<ThemeProvider>();
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: false, // appbar标题居左
@@ -45,6 +53,32 @@ class _SettingsPageState extends State<SettingsPage> {
         padding: EdgeInsets.only(left: 10, right: 10, top: 20),
         child: ListView(
           children: [
+            Container(
+              padding: EdgeInsets.only(left: 10),
+              child: Text('主题', style: TextStyle(fontSize: 13)),
+            ),
+            Card(
+              clipBehavior: Clip.antiAlias, // 裁切多余阴影
+              elevation: 0,
+              child: ListTile(
+                leading: Icon(Icons.dark_mode_outlined),
+                title: Text('深色模式'),
+                trailing: Switch(
+                  value: theme.darkMode,
+                  onChanged: (bool newValue) async {
+                    _darkModeValue = newValue;
+                    await context.read<ThemeProvider>().toggleTheme();
+                    print('保存函数调用完成${theme.darkMode}');
+                    setState(() {});
+                    //print('${settings!.autoCheckUpdate}');
+                  },
+                ),
+                //onTap: () {
+                //  Navigator.pushNamed(context, '/about');
+                //},
+              ),
+            ),
+            SizedBox(height: 10),
             Container(
               padding: EdgeInsets.only(left: 10),
               child: Text('更多', style: TextStyle(fontSize: 13)),

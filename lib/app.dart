@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:z_note/core/providers/theme_provider.dart';
 import 'package:z_note/core/routes/app_routes.dart';
 import 'package:z_note/main.dart';
 
@@ -12,18 +14,14 @@ class App extends StatefulWidget {
 class _AppState extends State<App> {
   @override
   Widget build(BuildContext context) {
+    final themeProvider = context.watch<ThemeProvider>();
     return MaterialApp(
       navigatorKey: navigatorKey,
       initialRoute: '/home',
       routes: appRoutes,
       title: 'Z Note',
       //home: Home(),
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color.fromARGB(255, 201, 235, 234),
-        ),
-      ),
+      theme: themeProvider.currentTheme,
     );
   }
 }

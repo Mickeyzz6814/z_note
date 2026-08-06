@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:z_note/app.dart';
+import 'package:z_note/core/providers/theme_provider.dart';
 import 'package:z_note/data/repositories/settings_repository.dart';
 import 'package:z_note/features/note/providers/note_provider.dart';
 import 'package:z_note/data/models/note_model.dart';
@@ -17,10 +18,18 @@ void main(List<String> args) async {
   await Hive.openBox('note_box');
   await Hive.openBox<SettingsModel>('settings_box');
   await SettingsRepository.init();
+  bool initDarkMode = await SettingsRepository.getThemeInformation();
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => NoteProvider()..loadNotes()),
+        ChangeNotifierProvider(
+          create: (_) {
+            final themeProvider = ThemeProvider();
+            themeProvider.setInitState(initDarkMode);
+            return themeProvider;
+          },
+        ),
       ],
       child: App(),
     ),

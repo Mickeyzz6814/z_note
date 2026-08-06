@@ -7,7 +7,8 @@ class SettingsModel extends HiveObject {
   @HiveField(0)
   bool autoCheckUpdate;
 
-  SettingsModel({
-    required this.autoCheckUpdate,
-  });
+  @HiveField(1)
+  bool darkMode;
+
+  SettingsModel({required this.autoCheckUpdate, required this.darkMode});
 }

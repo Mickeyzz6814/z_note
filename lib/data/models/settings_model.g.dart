@@ -18,15 +18,18 @@ class SettingsModelAdapter extends TypeAdapter<SettingsModel> {
     };
     return SettingsModel(
       autoCheckUpdate: fields[0] as bool,
+      darkMode: fields[1] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, SettingsModel obj) {
     writer
-      ..writeByte(1)
+      ..writeByte(2)
       ..writeByte(0)
-      ..write(obj.autoCheckUpdate);
+      ..write(obj.autoCheckUpdate)
+      ..writeByte(1)
+      ..write(obj.darkMode);
   }
 
   @override
