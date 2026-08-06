@@ -2,8 +2,9 @@ import 'dart:convert';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:z_note/core/constants/app_constants.dart';
 import 'package:z_note/main.dart';
-import 'package:z_note/models/settings_model.dart';
+import 'package:z_note/data/models/settings_model.dart';
 import 'package:http/http.dart' as http;
 
 String checkUri =
@@ -53,7 +54,7 @@ class CheckUpdate {
     SettingsModel? settings = settingsBox.get(0)!;
     bool isOn = settings.autoCheckUpdate;
     if (isOn) {
-      if (hasShow == false) {
+      if (AppConstants.hasShowUpdateDialog == false) {
         //print('自动更新调用网络操作函数');
         await _doNetworkCheck();
       }
@@ -66,7 +67,7 @@ class CheckUpdate {
   }
 
   static Future<void> _doNetworkCheck() async {
-    hasShow = true;
+    AppConstants.hasShowUpdateDialog = true;
     try {
       final res = await http.get(Uri.parse(checkUri));
       //print('获取更新配置');
@@ -77,7 +78,7 @@ class CheckUpdate {
       String remoteVersionName = remoteJson['versionName'];
       String remoteDownloadUrl = remoteJson['downloadUrl'];
       String remoteUpdateLog = remoteJson['updateLog'];
-      if (remoteBuildId > localBuildId) {
+      if (remoteBuildId > AppConstants.localBuildId) {
         //print('需要更新');
         if (navigatorKey.currentState == null) return;
         await showDialog(
@@ -111,7 +112,7 @@ class CheckUpdate {
           },
         );
       } else {
-        if (remoteBuildId == localBuildId) {
+        if (remoteBuildId == AppConstants.localBuildId) {
           //print('不需要更新');
           await showDialog(
             context: navigatorKey.currentContext!,

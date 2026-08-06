@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:z_note/main_pages/settings_page.dart';
-import 'package:z_note/main_pages/home_page.dart';
+import 'package:z_note/features/settings/prensentation/settings_page.dart';
+import 'package:z_note/features/home/presentation/home_page.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});

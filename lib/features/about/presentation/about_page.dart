@@ -3,7 +3,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:z_note/settings/update.dart';
+import 'package:z_note/features/settings/services/update_service.dart';
 
 class AboutPage extends StatefulWidget {
   const AboutPage({super.key});

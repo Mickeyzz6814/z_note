@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:z_note/db/note_db.dart';
-import 'package:z_note/main.dart';
-import 'package:z_note/models/note_model.dart';
-import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
+import 'package:z_note/features/note/providers/note_provider.dart';
+import 'package:z_note/data/models/note_model.dart';
 
 class NoteShowPage extends StatefulWidget {
   const NoteShowPage({super.key});
@@ -11,14 +10,14 @@ class NoteShowPage extends StatefulWidget {
   State<NoteShowPage> createState() => _NoteShowPageState();
 }
 
-class _NoteShowPageState extends State<NoteShowPage> with RouteAware {
+class _NoteShowPageState extends State<NoteShowPage> {
   String? noteId;
   NoteModel? note;
 
-  void loadCurrentNote() {
+  void loadNote() {
     if (noteId == null) return;
-    note = NoteDb.getNoteById(id: noteId!);
-    setState(() {});
+    note = context.read<NoteProvider>().getNoteById(id: noteId!);
+    //notifyListeners();
   }
 
   Future<bool> showDeleteDialog() async {
@@ -64,27 +63,12 @@ class _NoteShowPageState extends State<NoteShowPage> with RouteAware {
   void didChangeDependencies() {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
-    routeObserver.subscribe(this, ModalRoute.of(context)!);
     final routeArg = ModalRoute.of(context)?.settings.arguments;
     if (noteId != null) return;
     if (routeArg is Map) {
       noteId = routeArg['noteId'];
     }
-    loadCurrentNote();
-  }
-
-  @override
-  void didPopNext() {
-    // TODO: implement didPopNext
-    super.didPopNext();
-    loadCurrentNote();
-  }
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    routeObserver.unsubscribe(this);
-    super.dispose();
+    loadNote();
   }
 
   @override
@@ -99,8 +83,7 @@ class _NoteShowPageState extends State<NoteShowPage> with RouteAware {
               if (noteId == null) return;
               bool canDelete = await showDeleteDialog();
               if (canDelete) {
-                NoteDb.deleteNote(id: noteId!);
-                setState(() {});
+                await context.read<NoteProvider>().deleteNote(id: noteId!);
                 Navigator.popUntil(context, (route) => route.isFirst);
               }
             },
@@ -114,6 +97,10 @@ class _NoteShowPageState extends State<NoteShowPage> with RouteAware {
                 '/edit',
                 arguments: {'noteId': noteId},
               );
+              if (mounted) {
+                loadNote();
+                setState(() {});
+              }
               if (res == 'delete' && mounted) {
                 Navigator.pop(context);
               }

@@ -1,18 +1,16 @@
 //import 'package:flutter/widgets.dart';
 import 'package:hive/hive.dart';
-import 'package:z_note/models/note_model.dart';
-import 'dart:math';
+import 'package:z_note/core/utils/id_util.dart';
+import 'package:z_note/data/models/note_model.dart';
 
-class NoteDb {
+class NoteRepository {
   static Box get _box => Hive.box('note_box');
 
   static Future<String?> addNote({
     required String title,
     required String content,
   }) async {
-    String dateId = DateTime.now().millisecondsSinceEpoch.toString();
-    String numberId = Random().nextInt(10000).toString().padLeft(4, '0');
-    String uniqueId = '$dateId$numberId';
+    String uniqueId = await IdUtil.createId();
     NoteModel note = NoteModel(
       id: uniqueId,
       title: title,

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-//import 'package:flutter/services.dart';
-import 'package:z_note/db/note_db.dart';
-//import 'package:z_note/models/note_model.dart';
+import 'package:provider/provider.dart';
+import 'package:z_note/features/note/providers/note_provider.dart';
 
 class NoteEditPage extends StatefulWidget {
   const NoteEditPage({super.key});
@@ -60,7 +59,7 @@ class _NoteEditPageState extends State<NoteEditPage> {
         _contentController.text = '';
       }
     } else {
-      final note = NoteDb.getNoteById(id: noteId!);
+      final note = context.read<NoteProvider>().getNoteById(id: noteId!);
       if (note != null) {
         _titleController.text = note.title;
         _contentController.text = note.content;
@@ -172,14 +171,19 @@ class _NoteEditPageState extends State<NoteEditPage> {
   Future<String?> saveHandle() async {
     final String title = _titleController.text;
     final String content = _contentController.text;
+    final noteProvider = context.read<NoteProvider>();
     if (title.isEmpty || content.isEmpty) {
       return null;
     }
     if (noteId == null) {
-      final newId = await NoteDb.addNote(title: title, content: content);
+      final newId = await noteProvider.addNote(title: title, content: content);
       return newId;
     } else {
-      await NoteDb.editNote(id: noteId!, title: title, content: content);
+      await noteProvider.editNote(
+        id: noteId!,
+        title: title,
+        content: content,
+      );
       return noteId;
     }
     /*
@@ -214,7 +218,7 @@ class _NoteEditPageState extends State<NoteEditPage> {
           } else {
             final res = await showExitDialogTwo();
             if (res) {
-              await NoteDb.deleteNote(id: noteId!);
+              await context.read<NoteProvider>().deleteNote(id: noteId!);
               if (mounted) Navigator.pop(context, 'delete'); //向上一页返回delete标识
             } else {
               Navigator.pop(context);

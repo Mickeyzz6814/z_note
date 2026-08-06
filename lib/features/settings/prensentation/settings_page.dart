@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
-import 'package:z_note/models/settings_model.dart';
+import 'package:z_note/data/models/settings_model.dart';
+import 'package:z_note/data/repositories/settings_repository.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -12,18 +12,25 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   bool _autoCheckUpdateSwitchValue = true;
   SettingsModel? settings;
+  bool? value;
 
   @override
   void initState() {
     super.initState();
-    final settingsBox = Hive.box<SettingsModel>('settings_box');
-    settings = settingsBox.get(0);
-    if (settings == null) {
-      final ss = SettingsModel(autoCheckUpdate: true);
-      settingsBox.put(0, ss);
-      settings = SettingsModel(autoCheckUpdate: true);
-    }
-    _autoCheckUpdateSwitchValue = settings!.autoCheckUpdate;
+    _loadData();
+    //final settingsBox = Hive.box<SettingsModel>('settings_box');
+    //settings = settingsBox.get(0);
+    //if (settings == null) {
+    //  final ss = SettingsModel(autoCheckUpdate: true);
+    //  settingsBox.put(0, ss);
+    // settings = SettingsModel(autoCheckUpdate: true);
+    //}
+  }
+
+  Future<void> _loadData() async {
+    value = await SettingsRepository.getUpdateInformation();
+    setState(() {});
+    _autoCheckUpdateSwitchValue = value!;
   }
 
   @override
@@ -52,8 +59,10 @@ class _SettingsPageState extends State<SettingsPage> {
                   value: _autoCheckUpdateSwitchValue,
                   onChanged: (bool newValue) async {
                     _autoCheckUpdateSwitchValue = newValue;
-                    settings!.autoCheckUpdate = _autoCheckUpdateSwitchValue;
-                    await settings!.save();
+                    await SettingsRepository.saveUpdateInformation(
+                      updateInformation: _autoCheckUpdateSwitchValue,
+                    );
+                    print('保存函数调用完成$_autoCheckUpdateSwitchValue');
                     setState(() {});
                     //print('${settings!.autoCheckUpdate}');
                   },

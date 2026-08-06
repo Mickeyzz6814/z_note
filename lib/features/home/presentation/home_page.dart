@@ -1,65 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:z_note/db/note_db.dart';
-import 'package:z_note/main.dart';
-import 'package:z_note/models/note_model.dart';
-import 'package:z_note/settings/update.dart';
+import 'package:provider/provider.dart';
+import 'package:z_note/core/utils/time_util.dart';
+import 'package:z_note/features/note/providers/note_provider.dart';
+import 'package:z_note/features/settings/services/update_service.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> with RouteAware {
-  List<NoteModel> noteList = [];
-
-  String formatTime(DateTime time) {
-    String year = time.year.toString();
-    String month = time.month.toString().padLeft(2, '0');
-    String day = time.day.toString().padLeft(2, '0');
-    String hour = time.hour.toString().padLeft(2, '0');
-    String minute = time.minute.toString().padLeft(2, '0');
-    return '$year-$month-$day $hour:$minute';
-  }
-
-  void loadNotes() {
-    noteList = NoteDb.getAllNoteList();
-    //print('Load notes');
-    setState(() {});
-  }
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    CheckUpdate.autoCheckUpdate();
-    loadNotes();
-  }
-
-  @override
-  void didPopNext() {
-    // TODO: implement didPopNext
-    super.didPopNext();
-    loadNotes();
-  }
-
-  @override
-  void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
-    super.didChangeDependencies();
-    routeObserver.subscribe(this, ModalRoute.of(context)!);
-  }
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    routeObserver.unsubscribe(this);
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final noteProvider = context.watch<NoteProvider>();
+    final noteList = noteProvider.notes;
+    //NoteModel? item;
+
+    CheckUpdate.autoCheckUpdate();
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: false, // appbar标题居左
@@ -82,7 +37,7 @@ class _HomePageState extends State<HomePage> with RouteAware {
             RefreshIndicator(
               onRefresh: () async {
                 await Future.delayed(Duration(milliseconds: 380));
-                loadNotes();
+                context.read<NoteProvider>().loadNotes();
                 //print('Refresh');
               },
               child: noteList.isEmpty
@@ -147,7 +102,7 @@ class _HomePageState extends State<HomePage> with RouteAware {
                                       mainAxisAlignment: MainAxisAlignment.end,
                                       children: [
                                         Text(
-                                          formatTime(item.updateTime),
+                                          TimeUtil.formatShowTime(item.updateTime),
                                           style: TextStyle(fontSize: 10),
                                         ),
                                       ],
