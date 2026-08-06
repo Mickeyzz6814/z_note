@@ -2,7 +2,7 @@ name: z_note
 description: "A simple, easy-to-use note-taking app built with Flutter and Material Design 3."
 publishing_to: 'none'
 
-version: 1.1.6+8
+version: 1.1.7+9
 
 environment:
   sdk: ^3.12.2

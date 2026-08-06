@@ -1,6 +1,6 @@
 {
-  "buildId": 8,
-  "versionName": "1.1.6",
-  "downloadUrl": "https://gh-proxy.org/https://github.com/Mickeyzz6814/z_note/releases/download/v1.1.6/app-release.apk",
-  "updateLog": "Release v1.1.6\n优化了与更新相关的小问题"
+  "buildId": 9,
+  "versionName": "1.1.7",
+  "downloadUrl": "https://gh-proxy.org/https://github.com/Mickeyzz6814/z_note/releases/download/v1.1.7/app-release.apk",
+  "updateLog": "Release v1.1.7\n1.对项目进行了重构，增加了项目稳定性；\n2.新增了明暗主题色手动切换"
 }
